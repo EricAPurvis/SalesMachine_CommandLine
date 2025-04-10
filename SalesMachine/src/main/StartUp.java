@@ -1,88 +1,86 @@
 package main;
 
-import java.util.Scanner;
 import java.time.LocalDate;
+
+import apparatus.Screen;
+import apparatus.Window;
 
 public class StartUp {
 
 	public static LocalDate time;
-	public static boolean printerModeOn=true;
-	public static boolean autoSave=true;
 	public static OrderList orders;
+	
+	public static String sortDir = "asc";
+	
+	public static FileManager fManager;
+	public static PrinterHandler rp;
+	
+	public static Screen scr;
 	
 	public static void main(String args[]) {
 		
 		//Load and Select Printer for use
-        PrinterHandler rp = new PrinterHandler();
-        rp.selectPrinter();
+        rp = new PrinterHandler();
+//        rp.selectPrinter();
+        
+        //Get Date
+        time = LocalDate.now();
+        
+        //GUI
+		Window win = new Window();
+		scr = new Screen();
+		win.add(scr);
+		scr.validate();
+		win.validate();
 		
         //Get data structure ready
 		orders = new OrderList();
+		fManager = new FileManager();
 		
-		//Load Existing Data
-		FileManager fManager = new FileManager();
-		time = LocalDate.now();
-		orders = fManager.load(time);
-		
-		//Take Command Line input!
-		Scanner input = new Scanner(System.in);
-		String line = "";
-		while( !line.equals("end") ) {
-			try {
-				System.out.println("\nAwaiting Command!: ");
-				line = input.nextLine();
-				CommandList(line, fManager, rp);
-			}catch(Exception ex) {
-				System.out.println("Error With Command!");
-				System.err.println(ex.getMessage());
-			}
-		}
-		input.close();
-		
-		System.exit(0);
+		CommandList("load 2025-04-07");
+		CommandList("showDataAll");
 		
 	}
+	
+//Add combining files to show total over a range set of days
 	/*Command List
 	 * 
-	 * showDataAll          
-	 * showDataOne Target
-	 * showDataCOD
-	 * showDataPaid
+	 * showDataAll           --Added
+	 * showDataLike Target   --Added
+	 * showDataCOD           --Added
+	 * showDataPaid          --Added
 	 *  
-	 * addOrder Target Price
-	 * removeOrder Target Price
-	 * removeMiner Target
-	 * changeOrder Target toPrice fromPrice
-	 * printOrder Target price 
-	 * mergeMiners Target(Kept) Target(Removed)
-	 * changeMiner Target(To) Target(From) Price
+	 * addOrder Target Price            --Added
+	 * removeOrder Target Price         --Added
+	 * removeMiner Target               --Added
+	 * changeOrder Target toPrice fromPrice  --For now manually do it
+	 * printOrder Target price                  --Added
+	 * mergeMiners Target(Kept) Target(Removed) --Added
+	 * changeMiner Target(To) Target(From) Price --For now manually do it
 	 * 
-	 * setDP Target Price
-	 * addDP Target Price
+	 * setDP Target Price  //Deprecated? halfy, as command
+	 * addDP Target Price  //Make these create new Miner if does not exist yet  --Added
 	 * 
-	 * toggleCOD Target
-	 * togglePaid Target
+	 * toggleCOD Target  --Added
+	 * togglePaid Target --Added
 	 * 
-	 * toggleSave
-	 * togglePrint
-	 * printGrid desiredWidth (Height is calculated based on Width)
-	 * sortMinersAlpha(asc(default) /desc)
-	 * sortMinersItems Direction(asc/desc (default) )
+	 * printGrid desiredWidth (Height is calculated based on Width)  --Added
+	 * sortMinersAlpha(asc(default) /desc)                           --Added
+	 * sortMinersItems Direction(asc/desc (default) )                --Added
 	 * 
-	 * save
-	 * load Date(example = 2025-04-02)
-	 * loadToday
+	 * load Date(example = 2025-04-02) -- Added
+	 * 
 	 * 
 	*/
-	public static void CommandList(String line, FileManager fManager, PrinterHandler rp) {
+	public static void CommandList(String line) {
 		String test[] = line.split(" ");
 		switch(test[0]) {
 		
 			case "showDataAll":
 				orders.showData();
 				break;
-			case "showDataOne":
-				orders.showDataOne(test[1]);
+			case "showDataLike":
+				orders.showDataLike(test[1]);
 				break;
 			case "showDataCOD":
 				orders.showDataCOD();
@@ -93,77 +91,55 @@ public class StartUp {
 			
 			case "printOrder":
 				rp.printData(test[1], Float.parseFloat(test[2]));
-				
+				break;
 			case "addOrder":
 				orders.addOrder(test[1], Float.parseFloat(test[2]) );
-				if(printerModeOn) {
-					rp.printData(test[1], Float.parseFloat(test[2]));
-				}
-				if(autoSave) {
-					fManager.save(time, orders);	
-				}
+				rp.printData(test[1], Float.parseFloat(test[2]));
+				fManager.save(time, orders);	
 				break;
 			case "removeOrder":
 				orders.removeOneOrder(test[1], Float.parseFloat(test[2]) );
-				if(autoSave) {
-					fManager.save(time, orders);	
-				}
+				fManager.save(time, orders);	
 				break;
 			case "changeOrder":
 				boolean ans = orders.removeOneOrder(test[1], Float.parseFloat(test[3]) );
 				if(ans) {
 					orders.addOrder(test[1], Float.parseFloat(test[2]));
-					if(autoSave) {
-						fManager.save(time, orders);	
-					}
+					fManager.save(time, orders);	
 				}
 				break;
 			case "removeMiner":
 				orders.removeMiner(test[1]);
-				if(autoSave) {
-					fManager.save(time, orders);	
-				}
+				fManager.save(time, orders);	
 				break;
 				
 			case "setDP":
 				orders.setDP(test[1], Float.parseFloat(test[2]) );
-				if(autoSave) {
-					fManager.save(time, orders);	
-				}
+				fManager.save(time, orders);	
 				break;
 			case "addDP":
 				orders.addDP(test[1], Float.parseFloat(test[2]) );
-				if(autoSave) {
-					fManager.save(time, orders);	
-				}
+				fManager.save(time, orders);	
 				break;
 				
 			case "toggleCOD":
 				orders.toggleCOD(test[1]);
+				fManager.save(time, orders);	
 				break;
 			case "togglePaid":
 				orders.togglePaid(test[1]);
+				fManager.save(time, orders);	
 				break;
 
 			case "changeMiner":
 				orders.changeMiners(test[1], test[2], Float.parseFloat(test[3]));
-				if(autoSave) {
-					fManager.save(time, orders);	
-				}
+				fManager.save(time, orders);	
 				break;
 			case "mergeMiners":
 				orders.mergeMiners(test[1], test[2]);
-				if(autoSave) {
-					fManager.save(time, orders);	
-				}
+				fManager.save(time, orders);	
 				break;
-				
-			case "togglePrint":
-				printerModeOn = !printerModeOn;
-				break;
-			case "toggleSave":
-				autoSave = !autoSave;
-				
+	
 			case "printGrid":
 				orders.printGrid(Integer.parseInt(test[1]));
 				break;
@@ -173,9 +149,7 @@ public class StartUp {
 				}else {
 					orders.sortMinersAlphabeticlyAsc();
 				}
-				if(autoSave) {
-					fManager.save(time, orders);	
-				}
+				fManager.save(time, orders);	
 				break;
 			case "sortMinersItems":
 				if(test[1].equals("asc")) {
@@ -183,25 +157,17 @@ public class StartUp {
 				}else {
 					orders.sortMinersBySizeDesc();
 				}
-				if(autoSave) {
-					fManager.save(time, orders);	
-				}
+				fManager.save(time, orders);	
 				break;
 				
-			case "save":
-				fManager.save(time, orders);
-				break;
 			case "load":
 				LocalDate temp1 = LocalDate.parse(test[1]);
 				orders = fManager.load(temp1);
-				break;
-			case "loadToday":
-				LocalDate temp2=LocalDate.now();
-				orders = fManager.load(temp2);
+				scr.update();
 				break;
 				
 			default:
-				System.out.println("No Such Command!");
+				Screen.printSimpleGood("No Such Command!");
 				break;
 		}
 		

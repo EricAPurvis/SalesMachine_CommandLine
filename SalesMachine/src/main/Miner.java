@@ -12,6 +12,11 @@ public class Miner {
 	private boolean paid=false;
 	private boolean uploaded=false;
 	
+	public Miner(String name, float dp) {
+		this.name=name;
+		this.dp=dp;
+	}
+	
 	public Miner(String name, float price, float dp) {
 		this.name=name;
 		this.dp=dp;

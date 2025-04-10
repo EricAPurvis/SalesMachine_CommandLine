@@ -5,6 +5,8 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import apparatus.Screen;
 public class FileManager {
 
 	private String path="res/saves/";
@@ -16,7 +18,8 @@ public class FileManager {
 		try {
 			File file = new File(path+date+ext);
 			if(file.exists()) {
-				System.out.println("Loading Date "+date.toString());
+			//	System.out.println("Loading Date "+date.toString());
+				Screen.printSimpleGood("Loading: "+date.toString());
 				StartUp.time = date;
 				Scanner scanFile = new Scanner(file);
 				String temp="";
@@ -65,8 +68,9 @@ public class FileManager {
 				}
 				
 			}else {
-				System.out.println("File "+date+" not found!");
-				System.out.println("Load yesterday's data? (y/n)");
+				Screen.printSimpleError("File Not Found");
+			//	System.out.println("File "+date+" not found!");
+			/*	System.out.println("Load yesterday's data? (y/n)");
 				Scanner userInput = new Scanner(System.in);
 				String input = userInput.nextLine();
 				switch(input) {
@@ -77,10 +81,11 @@ public class FileManager {
 					case("n"):
 						break;
 				}
+			*/
 			}
 			
 		}catch(Exception ex) {
-			System.out.println(date+" Failed to load!");
+			Screen.printSimpleError(date+" Failed to load!");
 		}
 		
 		return(list);
@@ -89,7 +94,7 @@ public class FileManager {
 	public void save(LocalDate date, OrderList orderList) {
 		
 		try {
-			System.out.println("Saving as "+date.toString()+ext);
+		//	System.out.println("Saving as "+date.toString()+ext);
 			File file = new File(path+date.toString()+ext);
 			PrintWriter pw = new PrintWriter(file);
 			
@@ -139,7 +144,8 @@ public class FileManager {
 			pw.flush();
 			pw.close();
 		}catch(Exception ex) {
-			System.err.println(ex.getMessage()+"issue");
+			System.err.println(ex.getMessage()+" issue");
+			Screen.printSimpleError("Saving Error!");
 		}
 		
 	}

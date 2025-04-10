@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import apparatus.Screen;
+
 public class OrderList {
 
 	private ArrayList<Miner> Orders = new ArrayList<Miner>();
-	
+
 	protected ArrayList<Miner> getOrders() {
 		return Orders;
 	}
@@ -20,15 +22,24 @@ public class OrderList {
 				break;
 			}
 		}
+		
+		if(toRemove==null) {
+			Screen.printSimpleError("From Not Found");
+			return;
+		}
+		
 		for(int i=0; i<Orders.size(); i++) {
 			if(Orders.get(i).getName().equals(kept)) {
 				ArrayList<Order> temp = toRemove.getCart();
 				for(int x=0; x<temp.size(); x++) {
 					Orders.get(i).addOrder(temp.get(x).getPrice());
 				}
-				break;
+				Screen.printSimpleGood("Merge Sucessful!");
+				return;
 			}
 		}
+		Orders.add(toRemove);
+		Screen.printSimpleError("To Not Found");
 	}
 	
 	protected void changeMiners(String to, String from, float price) {
@@ -58,20 +69,25 @@ public class OrderList {
 		}
 	}
 	
+	//Done
 	protected void addMiner(Miner miner) {
 		Orders.add(miner);
 	}
 	
+	//Done
 	protected void addOrder(String name, float price) {
 		for(int x=0; x<Orders.size(); x++) {
 			if( Orders.get(x).getName().equals(name) ) {
 				Orders.get(x).addOrder(price);
+				Screen.printSimpleGood("Order Added");
 				return;
 			}
 		}
 		Orders.add(new Miner(name, price, 0));
+		Screen.printSimpleGood("Miner+Order Added");
 	}
 	
+	//Done
 	protected void toggleCOD(String name) {
 		for(int x=0; x<Orders.size(); x++) {
 			if( Orders.get(x).getName().equals(name) ) {
@@ -79,9 +95,10 @@ public class OrderList {
 				return;
 			}
 		}
-		System.out.println("Failed: User not found!");
+		Screen.printSimpleError("User not found!");
 	}
 	
+	//Done
 	protected void togglePaid(String name) {
 		for(int x=0; x<Orders.size(); x++) {
 			if( Orders.get(x).getName().equals(name) ) {
@@ -89,9 +106,10 @@ public class OrderList {
 				return;
 			}
 		}
-		System.out.println("Failed: User not found!");
+		Screen.printSimpleError("User not found!");
 	}
 	
+	//Don't use directly at this time
 	protected void setDP(String name, float dp) {
 		for(int x=0; x<Orders.size(); x++) {
 			if( Orders.get(x).getName().equals(name) ) {
@@ -99,19 +117,23 @@ public class OrderList {
 				return;
 			}
 		}
-		System.out.println("Failed: User not found!");
+		Screen.printSimpleError("User not found!");
 	}
 	
+	//Done
 	protected void addDP(String name, float dp) {
 		for(int x=0; x<Orders.size(); x++) {
 			if( Orders.get(x).getName().equals(name) ) {
 				Orders.get(x).setDP(Orders.get(x).getDP()+dp);
+				Screen.printSimpleGood("DP Added!");
 				return;
 			}
 		}
-		System.out.println("Failed: User not found!");
+		Screen.printSimpleGood("Making User Slot");
+		addMiner(new Miner(name, dp));
 	}
 	
+	//Done
 	protected boolean removeOneOrder(String name, float price) {
 		for(int x=0; x<Orders.size(); x++) {
 			if( Orders.get(x).getName().equals(name) ) {
@@ -119,21 +141,28 @@ public class OrderList {
 				if(Orders.get(x).getCart().size()==0) {
 					Orders.remove(x);
 				}
+				if(ans) {
+					Screen.printSimpleGood("Order Removed");
+				}else {
+					Screen.printSimpleGood("Order not found");
+				}
 				return ans;
 			}
 		}
-		System.out.println("Miner not found for one removal!");
+		Screen.printSimpleGood("Miner not found");
 		return false;
 	}
 	
+	//Done
 	protected void removeMiner(String name) {
 		for(int x=0; x<Orders.size(); x++) {
 			if( Orders.get(x).getName().equals(name) ) {
 				Orders.remove(x);
+				Screen.printSimpleGood("Remove Sucessful!");
 				return;
 			}
 		}
-		System.out.println("Miner not found for removal!");
+		Screen.printSimpleError("Miner not found!");
 	}
 	
 	protected Miner getCart(String name) {
@@ -145,7 +174,8 @@ public class OrderList {
 		System.out.println("User not found");
 		return(null);
 	}
-	
+
+	//Done
 	protected void showData() {
 		
 		int MinerTotal = Orders.size();
@@ -154,107 +184,122 @@ public class OrderList {
 		float dpTotal=0;
 		
 		for(int x=0; x<Orders.size(); x++) {
-			System.out.print(Orders.get(x).getName()+"\n\t");
+			Screen.printDataShown(Orders.get(x).getName()+"\n\t");
 			dpTotal+=Orders.get(x).getDP();
 			float total=0;
 			for(int y=0; y<Orders.get(x).getCart().size(); y++) {
 				float temp=Orders.get(x).getCart().get(y).getPrice();
 				total+=temp;
+				if(y%10==0) {
+					Screen.printDataShown("\n\t");
+				}
 				if(y!=Orders.get(x).getCart().size()-1) {
-					System.out.print(temp+", ");
+					Screen.printDataShown(temp+", ");
 				}else {
-					System.out.print(temp);
+					Screen.printDataShown(""+temp);
 				}
 			}
 			totalTotal+=total;
 			totalItems+=Orders.get(x).getCart().size();
-			System.out.print("\n\t\tTotal = "+total+"\tItems = "+Orders.get(x).getCart().size()+"\tDP = "+Orders.get(x).getDP()+"\tCOD = "+Orders.get(x).getCOD()+"\tPaid = "+Orders.get(x).getPaid()+"\tPayment Needed: "+(total-Orders.get(x).getDP())+"\n\n");
+			Screen.printDataShown("\n\t\tTotal = "+total+"\tItems = "+Orders.get(x).getCart().size()+"\tDP = "+Orders.get(x).getDP()+"\tCOD = "+Orders.get(x).getCOD()+"\tPaid = "+Orders.get(x).getPaid()+"\tPayment Needed: "+(total-Orders.get(x).getDP())+"\n\n");
 		}
 		
 		
-		System.out.println("\nTotal Totals = "+totalTotal+"\t Total Items = "+totalItems+"\t Total Miners = "+MinerTotal+"\t Total DP = "+dpTotal+"\t Average Item Cost = "+(float)(totalTotal/(float)totalItems));
+		Screen.printDataShown("\nTotal Totals = "+totalTotal+"    Total Items = "+totalItems+"    Total Miners = "+MinerTotal+"    Total DP = "+dpTotal+"    Average Item Cost = "+(float)(totalTotal/(float)totalItems));
 	}
-	
-	protected void showDataOne(String target) {
+
+	//Done
+	protected void showDataLike(String target) {
+		int MinerTotal = 0;
+		float totalTotal=0.0f;
+		int totalItems=0;
+		float dpTotal=0;
+		
 		for(int x=0; x<Orders.size(); x++) {
-			if(Orders.get(x).getName().equals(target)) {
-				System.out.print(Orders.get(x).getName()+"\n\t");
+			if(Orders.get(x).getName().toLowerCase().startsWith(target.toLowerCase())) {
+				MinerTotal++;
+				Screen.printDataShown(Orders.get(x).getName()+"\n\t");
 				float total=0;
 				for(int y=0; y<Orders.get(x).getCart().size(); y++) {
 					float temp=Orders.get(x).getCart().get(y).getPrice();
 					total+=temp;
 					if(y!=Orders.get(x).getCart().size()-1) {
-						System.out.print(temp+", ");
+						Screen.printDataShown(temp+", ");
 					}else {
-						System.out.print(temp);
+						Screen.printDataShown(""+temp);
 					}
 				}
-				System.out.print("\n\t\tTotal = "+total+"\tItems = "+Orders.get(x).getCart().size()+"\tDP = "+Orders.get(x).getDP()+"\tCOD = "+Orders.get(x).getCOD()+"\tPaid = "+Orders.get(x).getPaid()+"\tPayment Needed: "+(total-Orders.get(x).getDP())+"\n\n");
+				Screen.printDataShown("\n\t\tTotal = "+total+"\tItems = "+Orders.get(x).getCart().size()+"\tDP = "+Orders.get(x).getDP()+"\tCOD = "+Orders.get(x).getCOD()+"\tPaid = "+Orders.get(x).getPaid()+"\tPayment Needed: "+(total-Orders.get(x).getDP())+"\n\n");
 			}
 		}
 		
+		Screen.printDataShown("\nTotal Totals = "+totalTotal+"    Total Items = "+totalItems+"    Total Miners = "+MinerTotal+"    Total DP = "+dpTotal+"    Average Item Cost = "+(float)(totalTotal/(float)totalItems));
+		
 	}
-	
+	//Done	
 	protected void showDataCOD() {
 		
-		int MinerTotal = Orders.size();
+		int MinerTotal = 0;
 		float totalTotal=0.0f;
 		int totalItems=0;
 		float dpTotal=0;
 		
 		for(int x=0; x<Orders.size(); x++) {
 			if(Orders.get(x).getCOD()) {
-				System.out.print(Orders.get(x).getName()+"\n\t");
+				MinerTotal++;
+				Screen.printDataShown(Orders.get(x).getName()+"\n\t");
 				dpTotal+=Orders.get(x).getDP();
 				float total=0;
 				for(int y=0; y<Orders.get(x).getCart().size(); y++) {
 					float temp=Orders.get(x).getCart().get(y).getPrice();
 					total+=temp;
 					if(y!=Orders.get(x).getCart().size()-1) {
-						System.out.print(temp+", ");
+						Screen.printDataShown(temp+", ");
 					}else {
-						System.out.print(temp);
+						Screen.printDataShown(""+temp);
 					}
 				}
 				totalTotal+=total;
 				totalItems+=Orders.get(x).getCart().size();
-				System.out.print("\n\t\tTotal = "+total+"\tItems = "+Orders.get(x).getCart().size()+"\tDP = "+Orders.get(x).getDP()+"\tCOD = "+Orders.get(x).getCOD()+"\tPaid = "+Orders.get(x).getPaid()+"\tPayment Needed: "+(total-Orders.get(x).getDP())+"\n\n");
+				Screen.printDataShown("\n\t\tTotal = "+total+"\tItems = "+Orders.get(x).getCart().size()+"\tDP = "+Orders.get(x).getDP()+"\tCOD = "+Orders.get(x).getCOD()+"\tPaid = "+Orders.get(x).getPaid()+"\tPayment Needed: "+(total-Orders.get(x).getDP())+"\n\n");
 			}
 		}
 		
-		System.out.println("\nTotal Totals = "+totalTotal+"\t Total Items = "+totalItems+"\t Total Miners = "+MinerTotal+"\t Total DP = "+dpTotal+"\t Average Item Cost = "+(float)(totalTotal/(float)totalItems));
+		Screen.printDataShown("\nTotal Totals = "+totalTotal+"    Total Items = "+totalItems+"    Total Miners = "+MinerTotal+"    Total DP = "+dpTotal+"    Average Item Cost = "+(float)(totalTotal/(float)totalItems));
 	}
-	
+	//Done
 	protected void showDataPaid() {
 		
-		int MinerTotal = Orders.size();
+		int MinerTotal = 0;
 		float totalTotal=0.0f;
 		int totalItems=0;
 		float dpTotal=0;
 		
 		for(int x=0; x<Orders.size(); x++) {
 			if(Orders.get(x).getPaid()) {
-				System.out.print(Orders.get(x).getName()+"\n\t");
+				MinerTotal++;
+				Screen.printDataShown(Orders.get(x).getName()+"\n\t");
 				dpTotal+=Orders.get(x).getDP();
 				float total=0;
 				for(int y=0; y<Orders.get(x).getCart().size(); y++) {
 					float temp=Orders.get(x).getCart().get(y).getPrice();
 					total+=temp;
 					if(y!=Orders.get(x).getCart().size()-1) {
-						System.out.print(temp+", ");
+						Screen.printDataShown(temp+", ");
 					}else {
-						System.out.print(temp);
+						Screen.printDataShown(""+temp);
 					}
 				}
 				totalTotal+=total;
 				totalItems+=Orders.get(x).getCart().size();
-				System.out.print("\n\t\tTotal = "+total+"\tItems = "+Orders.get(x).getCart().size()+"\tDP = "+Orders.get(x).getDP()+"\tCOD = "+Orders.get(x).getCOD()+"\tPaid = "+Orders.get(x).getPaid()+"\tPayment Needed: "+(total-Orders.get(x).getDP())+"\n\n");
+				Screen.printDataShown("\n\t\tTotal = "+total+"\tItems = "+Orders.get(x).getCart().size()+"\tDP = "+Orders.get(x).getDP()+"\tCOD = "+Orders.get(x).getCOD()+"\tPaid = "+Orders.get(x).getPaid()+"\tPayment Needed: "+(total-Orders.get(x).getDP())+"\n\n");
 			}
 		}
 		
-		System.out.println("\nTotal Totals = "+totalTotal+"\t Total Items = "+totalItems+"\t Total Miners = "+MinerTotal+"\t Total DP = "+dpTotal+"\t Average Item Cost = "+(float)(totalTotal/(float)totalItems));
+		Screen.printDataShown("\nTotal Totals = "+totalTotal+"    Total Items = "+totalItems+"    Total Miners = "+MinerTotal+"    Total DP = "+dpTotal+"    Average Item Cost = "+(float)(totalTotal/(float)totalItems));
 	}
-	
+
+	//Done algorithm fixed I hope
 	protected void printGrid(int width) {
 		
 		ArrayList<Miner> temp = new ArrayList<Miner>();
@@ -269,6 +314,7 @@ public class OrderList {
 		for(int i=0; i<temp.size(); i++) {
 			if(temp.get(i).getCart().size()==1) {
 				ones.add(temp.remove(i));
+				i--;
 			}
 		}
 		
@@ -280,54 +326,79 @@ public class OrderList {
 			}
 		}
 		
-		System.out.println("2+ Items grid: ");
-		System.out.print("   ");
+		Screen.printDataShown("2+ Items grid: \n");
+		Screen.printDataShown("   ");
 		
 		//Column numbers
 		for(int x=0; x<width; x++) {
 			for(int z=0; z<largest/2; z++) {
-				System.out.print(" ");
+				Screen.printDataShown("  ");
 			}
-			String test = ""+(x+1)+"    ";
-			System.out.print(test);
+			String test = ""+(x+1)+"";
+			Screen.printDataShown(test);
 			for(int z=0; z<largest/2-1; z++) {
-				System.out.print(" ");
+				Screen.printDataShown("  ");
 			}
 		}
 		
-		System.out.println("");
+		Screen.printDataShown("\n");
 		
 		//Sort 2+ carts
 		for(int y=0; y<(int)Math.ceil((float)temp.size()/(float)width); y++) {
 			for(int x=0; x<width; x++) {
 				if(x==0) {
-					System.out.print((y+1)+"  ");
+					Screen.printDataShown((y+1)+"  ");
 				}
 				if( y*width+x < temp.size()) {
-					System.out.print(temp.get(y*width+x).getName()+"    ");
-					for(int z=0; z<largest-temp.get(y*width+x).getName().length(); z++) {
-						System.out.print(" ");
+					
+					for(int z=0; z<(largest-temp.get(y*width+x).getName().length())/2; z++) {
+						Screen.printDataShown("  ");
 					}
+					
+					Screen.printDataShown(temp.get(y*width+x).getName());
+					
+					for(int z=0; z<(largest-temp.get(y*width+x).getName().length())/2; z++) {
+						Screen.printDataShown("  ");
+					}
+					
 				}
 			}
-			System.out.println("\n");
+			Screen.printDataShown("\n\n");
+		}
+		
+		//Find Largest Name
+		largest=0;
+		for(int i=0; i<ones.size(); i++) {
+			if(ones.get(i).getName().length()>largest) {
+				largest=ones.get(i).getName().length();
+			}
 		}
 		
 		//Print 1 of carts
-		System.out.println("\n1's:");
+		Screen.printDataShown("\n\n1's:\n");
 		int oneOfWidth=5;
 		for(int y=0; y<(int)Math.ceil((float)ones.size()/(float)oneOfWidth); y++) {
 			for(int x=0; x<oneOfWidth; x++) {
-				if( y*width+x < ones.size()) {
-					System.out.print(ones.get(y*oneOfWidth+x).getName()+" ");
+				if( y*oneOfWidth+x < ones.size()) {
+					for(int z=0; z<(largest-ones.get(y*oneOfWidth+x).getName().length())/2; z++) {
+						Screen.printDataShown("  ");
+					}
+					
+					Screen.printDataShown(ones.get(y*oneOfWidth+x).getName()+"       ");
+					
+					for(int z=0; z<(largest-ones.get(y*oneOfWidth+x).getName().length())/2; z++) {
+						Screen.printDataShown("  ");
+					}
 				}
 			}
+			Screen.printDataShown("\n\n");
 		}
 		
-		System.out.println("\n");
+		Screen.printDataShown("\n\n");
 		
 	}
 	
+	//Done
 	protected void sortMinersAlphabeticlyAsc() {
 		Collections.sort(Orders, new Comparator<Miner>() {
 		    public int compare(Miner m1, Miner m2) {
@@ -336,6 +407,7 @@ public class OrderList {
 		});
 	}
 	
+	//Done
 	protected void sortMinersAlphabeticlyDesc() {
 		Collections.sort(Orders, new Comparator<Miner>() {
 		    public int compare(Miner m1, Miner m2) {
@@ -344,6 +416,7 @@ public class OrderList {
 		});
 	}
 	
+	//Done
 	protected void sortMinersBySizeDesc() {
 		Collections.sort(Orders, new Comparator<Miner>() {
 		    public int compare(Miner m1, Miner m2) {
@@ -352,6 +425,7 @@ public class OrderList {
 		});
 	}
 	
+	//Done
 	protected void sortMinersBySizeAsc() {
 		Collections.sort(Orders, new Comparator<Miner>() {
 		    public int compare(Miner m1, Miner m2) {

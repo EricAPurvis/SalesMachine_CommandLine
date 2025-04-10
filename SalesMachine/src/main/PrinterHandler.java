@@ -11,6 +11,7 @@ import java.awt.print.PrinterJob;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import apparatus.Screen;
 import loader.ImageGetter;
 
 public class PrinterHandler implements Printable{
@@ -67,8 +68,9 @@ public class PrinterHandler implements Printable{
         try {
         	pj.print();
         } catch (Exception ex) {
-            ex.printStackTrace();
-            System.err.println(ex.getMessage());
+           // ex.printStackTrace();
+        	Screen.printSimpleError("Printer Not Working!");
+          //  System.err.println(ex.getMessage());
         }
     }
 	

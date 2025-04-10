@@ -10,7 +10,7 @@ public class ImageGetter {
 	public static BufferedImage get(String path) {
 		BufferedImage img=null;
 		try {
-			img= ImageIO.read(new File(path));
+			img = ImageIO.read(new File(path));
 		}catch(Exception ex) {
 			System.err.print("Failed To Get Image: "+path);
 		}
