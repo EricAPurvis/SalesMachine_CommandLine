@@ -168,6 +168,12 @@ public class Screen extends JPanel{
 			public void actionPerformed(ActionEvent e){
 				StartUp.time = StartUp.time.minusDays(1);
 				dateShown.setText(StartUp.time.toString());
+				
+				resetDataShown();
+				StartUp.time = LocalDate.parse(dateShown.getText());
+				StartUp.CommandList("load "+StartUp.time.toString());
+				printDataShown("Loading: "+StartUp.time.toString()+" Data\n\n");
+				StartUp.CommandList("showDataAll");
 			}        
 		}); 
 		nextDate.addActionListener(new ActionListener(){            
@@ -175,6 +181,12 @@ public class Screen extends JPanel{
 			public void actionPerformed(ActionEvent e){                
 				StartUp.time = StartUp.time.plusDays(1);
 			 	dateShown.setText(StartUp.time.toString());
+			 	
+				resetDataShown();
+				StartUp.time = LocalDate.parse(dateShown.getText());
+				StartUp.CommandList("load "+StartUp.time.toString());
+				printDataShown("Loading: "+StartUp.time.toString()+" Data\n\n");
+				StartUp.CommandList("showDataAll");
 			}        
 		}); 
 		load.addActionListener(new ActionListener(){            
@@ -416,7 +428,7 @@ public class Screen extends JPanel{
 			public void actionPerformed(ActionEvent e){                
 				try {
 					resetDataShown(28);
-					StartUp.CommandList("printGrid 6");
+					StartUp.CommandList("printGrid 7");
 				}catch(Exception ex) {
 					printSimpleError("Printing Grid Error");
 				}

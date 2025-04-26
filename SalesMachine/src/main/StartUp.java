@@ -21,7 +21,7 @@ public class StartUp {
 		
 		//Load and Select Printer for use
         rp = new PrinterHandler();
-//        rp.selectPrinter();
+        rp.selectPrinter();
         
         //Get Date
         time = LocalDate.now();
@@ -37,7 +37,7 @@ public class StartUp {
 		orders = new OrderList();
 		fManager = new FileManager();
 		
-		CommandList("load 2025-04-07");
+		CommandList("load "+time.toString());
 		CommandList("showDataAll");
 		
 	}

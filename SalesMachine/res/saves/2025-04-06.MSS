@@ -33,7 +33,7 @@ Paid
 Uploaded
 0
 Items
-100.0,80.0,120.0,200.0,160.0
+100.0,80.0,120.0,160.0
 User
 calmapaulinejocel
 DP
@@ -121,7 +121,7 @@ Items
 User
 jemneko
 DP
-0.0
+500.0
 COD
 0
 Paid
@@ -153,7 +153,7 @@ Paid
 Uploaded
 0
 Items
-120.0,160.0,100.0,120.0,200.0
+120.0,160.0,100.0,120.0
 User
 marj0831
 DP
